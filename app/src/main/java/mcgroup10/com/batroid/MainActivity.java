@@ -1,5 +1,6 @@
 package mcgroup10.com.batroid;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -66,18 +67,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+
         int id = item.getItemId();
 
         if (id == R.id.nav_route) {
-
+            startActivity(new Intent(this, Route.class));
         } else if (id == R.id.nav_weather) {
-
+            startActivity(new Intent(this, Weather.class));
         } else if (id == R.id.nav_dnd) {
-
+            startActivity(new Intent(this, DoNotDisturb.class));
         } else if (id == R.id.nav_autosms) {
-
+            startActivity(new Intent(this, AutoReply.class));
         } else if (id == R.id.nav_birthday) {
-
+            startActivity(new Intent(this, Birthdays.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

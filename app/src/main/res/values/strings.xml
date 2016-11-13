@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">Batroid</string>
+    <string name="route_name">Route Navigation</string>
+    <string name="weather_name">Weather</string>
+    <string name="dnd_name">Do Not Disturb</string>
+    <string name="autoreply_name">Auto Reply</string>
+    <string name="birthdays_name">Birthdays</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

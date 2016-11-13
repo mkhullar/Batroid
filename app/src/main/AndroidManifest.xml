@@ -18,6 +18,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Route"
+            android:label="@string/route_name" />
+        <activity
+            android:name=".Weather"
+            android:label="@string/weather_name" />
+        <activity
+
+            android:name=".DoNotDisturb"
+            android:label="@string/dnd_name" />
+        <activity
+            android:name=".AutoReply"
+            android:label="@string/autoreply_name" />
+        <activity
+            android:name=".Birthdays"
+            android:label="@string/birthdays_name" />
     </application>
 
 </manifest>
