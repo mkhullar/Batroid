@@ -5,6 +5,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -33,7 +37,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Route"
+            android:name=".RouteMap"
             android:label="@string/route_name" />
         <activity
             android:name=".Weather"
@@ -64,5 +68,5 @@
 
         </receiver>
     </application>
-
+    <service android:name="com.chaitanya.googlemapsapidemo.GpsService" android:exported="true" android:enabled="true"/>
 </manifest>
