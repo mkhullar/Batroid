@@ -1,11 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".DoNotDisturb" >
 
-    <TextView
-        android:text="This is Do Not Disturb page"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView2" />
+        android:orientation="horizontal"
+        android:background="@color/colorPrimaryDark"
+        android:paddingTop="5dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="5dp"
+        android:weightSum="1">
+
+        <!--Latitude-->
+        <TextView
+            android:id="@+id/lat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFCC"
+            android:layout_weight="0.5"
+            android:text="Lat: " />
+
+        <!--Longitude-->
+        <TextView
+            android:id="@+id/lon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFCC"
+            android:layout_weight="0.5"
+            android:text="Long: " />
+    </LinearLayout>
+
+
+
+    <!--GoogleMap fragment-->
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="452dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="2"
+        tools:context=".DoNotDisturb" >
+
+        <Button
+            android:text="Start DND"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/button"
+            android:onClick="startGeoClick"
+            android:layout_weight="1" />
+
+        <Button
+                android:text="Stop DND"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button2"
+                android:onClick="stopGeoClick"
+            android:layout_weight="1" />
+    </LinearLayout>
+
 </LinearLayout>
