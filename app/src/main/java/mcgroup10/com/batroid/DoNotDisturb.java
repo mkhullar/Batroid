@@ -2,9 +2,10 @@ package mcgroup10.com.batroid;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -53,13 +55,11 @@ public class DoNotDisturb extends AppCompatActivity
         OnMapReadyCallback,
         GoogleMap.OnMapClickListener,
         GoogleMap.OnMarkerClickListener,
-        GeofenceTransitionReceiver.Receiver,
         ResultCallback<Status> {
 
     private AudioManager myAudioManager;
 
-    private GeofenceTransitionReceiver mReceiver;
-
+    private ResponseReceiver receiver;
 
     private static final String TAG = "DND";
 
@@ -95,9 +95,17 @@ public class DoNotDisturb extends AppCompatActivity
         //final AudioManager mode = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         //myAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
-        mReceiver = new GeofenceTransitionReceiver(new Handler());
-        mReceiver.setReceiver(this);
+        IntentFilter broadcastFilter = new IntentFilter(ResponseReceiver.LOCAL_ACTION);
+        receiver = new ResponseReceiver();
 
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(receiver, broadcastFilter);
+
+    }
+
+    public void broadcastIntent(View view){
+        Intent intent = new Intent();
+        intent.setAction("mcgroup10.com.batroid.CUSTOM_INTENT"); sendBroadcast(intent);
     }
 
     // Initialize GoogleMaps
@@ -373,10 +381,8 @@ public class DoNotDisturb extends AppCompatActivity
         Log.d(TAG, "createGeofencePendingIntent");
         if ( geoFencePendingIntent != null )
             return geoFencePendingIntent;
+        Intent intent = new Intent( DoNotDisturb.this, GeofenceTransitionService.class);
 
-        //Intent intent = new Intent( this, GeofenceTransitionService.class);
-        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, GeofenceTransitionService.class);
-        //intent.putExtra("receiver", mReceiver);
         return PendingIntent.getService(
                 this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
     }
@@ -401,6 +407,7 @@ public class DoNotDisturb extends AppCompatActivity
         } else {
             // inform about fail
         }
+
     }
 
     // Draw Geofence circle on GoogleMap
@@ -472,10 +479,18 @@ public class DoNotDisturb extends AppCompatActivity
             geoFenceLimits.remove();
     }
 
-
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-        Toast.makeText(getApplicationContext(), "Message received : " + resultData.getString("Status"), Toast.LENGTH_SHORT).show();
+    protected void onDestroy(){
+        super.onDestroy();
+        LocalBroadcastManager localBroadcastManager= LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.unregisterReceiver(receiver);
     }
 
+    public class ResponseReceiver extends BroadcastReceiver {
+        public static final String LOCAL_ACTION = "mcgroup10.com.batroid.CUSTOM_INTENT";
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(context, "Intent Detected : " + intent.getStringExtra("Status"), Toast.LENGTH_LONG).show();
+        }
+    }
 }

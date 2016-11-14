@@ -48,6 +48,21 @@
         <activity
             android:name=".Birthdays"
             android:label="@string/birthdays_name" />
+
+        <!--receiver android:name=".DoNotDisturb$MyWebRequestReceiver" >
+            <intent-filter>
+                <action android:name="mcgroup10.com.batroid.intent.action.PROCESS_RESPONSE" />
+            </intent-filter>
+        </receiver-->
+
+        <receiver android:name=".DoNotDisturb$ResponseReceiver">
+
+            <intent-filter>
+                <action android:name="mcgroup10.com.batroid.CUSTOM_INTENT">
+                </action>
+            </intent-filter>
+
+        </receiver>
     </application>
 
 </manifest>
