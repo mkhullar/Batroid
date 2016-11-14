@@ -68,5 +68,5 @@
 
         </receiver>
     </application>
-    <service android:name="com.chaitanya.googlemapsapidemo.GpsService" android:exported="true" android:enabled="true"/>
+    <service android:name="mcgroup10.com.batroid.GpsService" android:exported="true" android:enabled="true"/>
 </manifest>
