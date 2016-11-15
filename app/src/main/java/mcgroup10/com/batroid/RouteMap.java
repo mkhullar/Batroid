@@ -67,7 +67,7 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
     protected LocationManager locationManager;
     private Handler mHandler = new Handler();
     Boolean gpsClicked = false;
-    Boolean gpsAccept = false;
+    Boolean showedRoute = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,95 +112,16 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
 
         }
 
-        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        String address = null;
-        if(!statusOfGPS && !gpsClicked){
-            showDialogGPS();
-        }else {
-            GpsService gps = new GpsService(this);
-            if(gps.canGetLocation){
-                Intent intent = new Intent(this,GpsService.class);
-                startService(intent);
-                Location location = gps.getLocation();
-
-                if(location!=null){
-                    address = gps.getAddress(location).get(0).getAddressLine(0);
-                }
-            }
-        }
-
-        final String _origin = address; // get from current location
-        Date today = new Date();
-        Date fromDate = new Date();
-        Date toDate = getEnd(today);
-        Log.d("Events from ", fromDate.toString());
-        Log.d("Events to ", toDate.toString());
-
-        Log.d("Getting all events", "Calendar");
-        String temp_location = null;
-        String event_title = null;
-        String event_description = null;
-        Date fromCalendar = null;
-        int count = 0;
-        for(EventInfo eventInfo: EventInfo.getEvents(this,fromDate,toDate,null,null)) {
-            temp_location = eventInfo.getLocation();
-            fromCalendar = eventInfo.getStartDate();
-            event_title = eventInfo.getTitle();
-            Log.d("events", "location is " + temp_location);
-            Log.d("MainActivity - Events", eventInfo.toString());
-            count++;
-            if(count >= 1)
-            {
-                break;
-            }
-        }
-        final String _destination = temp_location;
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        if(fromCalendar != null && fromCalendar.before(toDate) == true){
-            //Do Action
-            sendRequest(_origin, _destination);
-
-            final int MY_NOTIFICATION_ID=1;
-            NotificationManager notificationManager;
-            Notification myNotification;
-
-            Intent myIntent = new Intent(this, RouteMap.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(
-                    this,
-                    0,
-                    myIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-
-            myNotification = new NotificationCompat.Builder(this)
-                    .setContentTitle("New Route Available: From - " + _origin + " to Destination - " + _destination)
-                    .setContentText("Leave for " + event_title)
-                    .setTicker("Notification!")
-                    .setWhen(System.currentTimeMillis())
-                    .setContentIntent(pendingIntent)
-                    .setDefaults(Notification.DEFAULT_SOUND)
-                    .setAutoCancel(true)
-                    .setSmallIcon(R.drawable.start_blue)
-                    .build();
-
-            notificationManager =
-                    (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(MY_NOTIFICATION_ID, myNotification);
-        }
+        GPSEnabled();
     }
 
     private void sendRequest(String ori, String dest) {
         if (ori.isEmpty()) {
-            Toast.makeText(this, "Please enter origin address!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Please enter origin address!", Toast.LENGTH_SHORT).show();
             return;
         }
         if (dest.isEmpty()) {
-            Toast.makeText(this, "Please enter destination address!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Please enter destination address!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -287,6 +208,7 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
 
     public void GPSEnabled() {
         final int FIVE_SECONDS = 5000;
+        final GpsService gps = new GpsService(this);
         mHandler.postDelayed(new Runnable() {
             public void run() {
                 LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -299,6 +221,13 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
                 mHandler.postDelayed(this, FIVE_SECONDS);
             }
         }, FIVE_SECONDS);
+        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if(!statusOfGPS && !gpsClicked){
+            showDialogGPS();
+        }else {
+            getGPSLocation();
+        }
     }
 
     public void getGPSLocation(){
@@ -309,8 +238,79 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
             Location location = gps.getLocation();
 
             if(location!=null){
-                String address = gps.getAddress(location).get(0).getAddressLine(0);
-                String postalCode =gps.getAddress(location).get(0).getPostalCode();
+                if(!showedRoute)
+                {
+                    String address = gps.getAddress(location).get(0).getAddressLine(0);
+                    String postalCode =gps.getAddress(location).get(0).getPostalCode();
+                    final String _origin = address; // get from current location
+                    Date today = new Date();
+                    Date fromDate = new Date();
+                    Date toDate = getEnd(today);
+                    Log.d("Events from ", fromDate.toString());
+                    Log.d("Events to ", toDate.toString());
+
+                    Log.d("Getting all events", "Calendar");
+                    String temp_location = null;
+                    String event_title = null;
+                    String event_description = null;
+                    Date fromCalendar = null;
+                    int count = 0;
+                    for(EventInfo eventInfo: EventInfo.getEvents(this,fromDate,toDate,null,null)) {
+                        temp_location = eventInfo.getLocation();
+                        fromCalendar = eventInfo.getStartDate();
+                        event_title = eventInfo.getTitle();
+                        Log.d("events", "location is " + temp_location);
+                        Log.d("MainActivity - Events", eventInfo.toString());
+                        count++;
+                        if(count >= 1)
+                        {
+                            break;
+                        }
+                    }
+                    final String _destination = temp_location;
+
+                    // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+                    SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                            .findFragmentById(R.id.map);
+                    mapFragment.getMapAsync(this);
+
+                    if(fromCalendar == null)
+                    {
+                        Toast.makeText(this, "There are no events in calendar for today!", Toast.LENGTH_LONG).show();
+                    }
+
+                    if(fromCalendar != null && fromCalendar.before(toDate) == true){
+                        //Do Action
+                        sendRequest(_origin, _destination);
+
+                        final int MY_NOTIFICATION_ID=1;
+                        NotificationManager notificationManager;
+                        Notification myNotification;
+
+                        Intent myIntent = new Intent(this, RouteMap.class);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(
+                                this,
+                                0,
+                                myIntent,
+                                PendingIntent.FLAG_UPDATE_CURRENT);
+
+                        myNotification = new NotificationCompat.Builder(this)
+                                .setContentTitle("New Route Available: From - " + _origin + " to Destination - " + _destination)
+                                .setContentText("Leave for " + event_title)
+                                .setTicker("Notification!")
+                                .setWhen(System.currentTimeMillis())
+                                .setContentIntent(pendingIntent)
+                                .setDefaults(Notification.DEFAULT_SOUND)
+                                .setAutoCancel(true)
+                                .setSmallIcon(R.drawable.start_blue)
+                                .build();
+
+                        notificationManager =
+                                (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.notify(MY_NOTIFICATION_ID, myNotification);
+                    }
+                    showedRoute = true;
+                }
             }
         }
     }
@@ -330,14 +330,14 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
                         new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                 dialog.dismiss();
                 gpsClicked = false;
-                GPSEnabled();
+                //GPSEnabled();
             }
         });
         builder.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 gpsClicked = false;
-                GPSEnabled();
+                //GPSEnabled();
             }
         });
         AlertDialog alert = builder.create();
