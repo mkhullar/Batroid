@@ -117,11 +117,11 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
 
     private void sendRequest(String ori, String dest) {
         if (ori.isEmpty()) {
-            Toast.makeText(this, "Please enter origin address!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Please enter origin address!", Toast.LENGTH_SHORT).show();
             return;
         }
         if (dest.isEmpty()) {
-            Toast.makeText(this, "Please enter destination address!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Please enter destination address!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -273,6 +273,11 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
                     SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                             .findFragmentById(R.id.map);
                     mapFragment.getMapAsync(this);
+
+                    if(fromCalendar == null)
+                    {
+                        Toast.makeText(this, "There are no events in calendar for today!", Toast.LENGTH_LONG).show();
+                    }
 
                     if(fromCalendar != null && fromCalendar.before(toDate) == true){
                         //Do Action
