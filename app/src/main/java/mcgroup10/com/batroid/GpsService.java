@@ -66,7 +66,7 @@ public class GpsService extends Service implements LocationListener {
 
             if (!isGPSEnabled && !isNetworkEnabled) {
                 // no network provider is enabled
-                Toast.makeText(this,"Disabled both", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext,"Disabled both", Toast.LENGTH_LONG).show();
             } else {
                 try{
                     this.canGetLocation = true;
@@ -148,7 +148,7 @@ public class GpsService extends Service implements LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
-        Intent dialogIntent = new Intent(this, RouteMap.class);
+        Intent dialogIntent = new Intent(mContext, MainActivity.class);
         startActivity(dialogIntent);
     }
 
