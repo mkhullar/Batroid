@@ -9,6 +9,12 @@
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
+    <service
+        android:name=".GpsService"
+        android:enabled="true"
+        android:exported="true" />
 
     <application
         android:allowBackup="true"
@@ -16,15 +22,16 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <service android:name=".GeofenceTransitionService" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDeULE-hNvbqT4xVDCqe5AvMEIxhFRyqTg"/>
-        <!--meta-data
+            android:value="AIzaSyDeULE-hNvbqT4xVDCqe5AvMEIxhFRyqTg" />
+        <!--
+            meta-data
             android:name="com.google.android.gms.version"
-            android:value="9080000" /-->
+            android:value="9080000" /
+        -->
 
         <activity
             android:name=".MainActivity"
@@ -43,7 +50,6 @@
             android:name=".Weather"
             android:label="@string/weather_name" />
         <activity
-
             android:name=".DoNotDisturb"
             android:label="@string/dnd_name" />
         <activity
@@ -53,20 +59,24 @@
             android:name=".Birthdays"
             android:label="@string/birthdays_name" />
 
-        <!--receiver android:name=".DoNotDisturb$MyWebRequestReceiver" >
+        <!--
+        receiver android:name=".DoNotDisturb$MyWebRequestReceiver" >
             <intent-filter>
                 <action android:name="mcgroup10.com.batroid.intent.action.PROCESS_RESPONSE" />
             </intent-filter>
-        </receiver-->
+        </receiver
+        -->
 
         <receiver android:name=".DoNotDisturb$ResponseReceiver">
-
             <intent-filter>
-                <action android:name="mcgroup10.com.batroid.CUSTOM_INTENT">
-                </action>
+                <action android:name="mcgroup10.com.batroid.CUSTOM_INTENT"></action>
             </intent-filter>
-
         </receiver>
+
+        <service
+            android:name=".SmsService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
-    <service android:name="mcgroup10.com.batroid.GpsService" android:exported="true" android:enabled="true"/>
+
 </manifest>
