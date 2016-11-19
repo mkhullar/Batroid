@@ -3,22 +3,21 @@ package mcgroup10.com.batroid;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.ContactsContract;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.support.annotation.RequiresApi;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,30 +31,31 @@ import java.util.List;
  */
 
 public class Birthdays extends AppCompatActivity {
-    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 1;
+
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
+    final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+    private static final String TAG = "Birthdays";
+
     Button sendBtn;
+    TextView textDetail;
+    //EditText txtphoneNo;
     EditText txtphoneNo;
     EditText txtMessage;
     String phoneNo;
     String message;
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100; // Request code for READ_CONTACTS. It can be any number > 0.
-    private static final String TAG = "MainActivity";
+
     ArrayList<String> contactName = new ArrayList<String>();
     ArrayList<String> contactNumber = new ArrayList<String>();
-    TextView textDetail;
     StringBuffer sb = new StringBuffer();
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_birthdays);
-
         textDetail = (TextView) findViewById(R.id.textView1);
-
         sendBtn = (Button) findViewById(R.id.btnSendSMS);
-
-
-        showContacts(); // Read and show the contacts
+        checkReceivePermission();
         sendBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 sendSMSMessage();
@@ -63,75 +63,93 @@ public class Birthdays extends AppCompatActivity {
         });
     }
 
-    private void showContacts() {
-        // Check the SDK version and whether the permission is already granted or not.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
-            //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
-        } else {
-            // Android version is lesser than 6.0 or the permission is already granted.
-            getContactNames();
-        }
-    }
-
-    protected void sendSMSMessage() {
-        //phoneNo = txtphoneNo.getText().toString();
-        message = "Happy birthday!";
-
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.SEND_SMS)) {
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.SEND_SMS},
-                        MY_PERMISSIONS_REQUEST_SEND_SMS);
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_SEND_SMS: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    SmsManager smsManager = SmsManager.getDefault();
-                    for (int i = 0; i < contactNumber.size(); i++) {
-                        smsManager.sendTextMessage(contactNumber.get(i), null, message, null, null);
-                        Toast.makeText(getApplicationContext(), "SMS sent.", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "SMS failed, please try again.", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                break;
-            }
-            case PERMISSIONS_REQUEST_READ_CONTACTS: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    showContacts(); // Permission is granted
-                } else {
-                    Toast.makeText(this, "Until you grant the permission, we canot display the names", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-
-
-    }
-
     /*
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
-        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showContacts(); // Permission is granted
-            } else {
-                Toast.makeText(this, "Until you grant the permission, we canot display the names", Toast.LENGTH_SHORT).show();
-            }
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    protected void checkReceivePermission() {
+        int hasWriteContactsPermission = checkSelfPermission(Manifest.permission.RECEIVE_SMS);
+        if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] {Manifest.permission.RECEIVE_SMS},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+            return;
         }
+        startYourWork();
     }
     */
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void checkReceivePermission() {
+        List<String> permissionsNeeded = new ArrayList<String>();
+
+        final List<String> permissionsList = new ArrayList<String>();
+        if (!addPermission(permissionsList, Manifest.permission.SEND_SMS))
+            permissionsNeeded.add("GPS");
+        if (!addPermission(permissionsList, Manifest.permission.READ_CONTACTS))
+            permissionsNeeded.add("Read Contacts");
+        if (!addPermission(permissionsList, Manifest.permission.WRITE_CONTACTS))
+            permissionsNeeded.add("Write Contacts");
+
+        if (permissionsList.size() > 0) {
+            if (permissionsNeeded.size() > 0) {
+                // Need Rationale
+                String message = "You need to grant access to " + permissionsNeeded.get(0);
+                for (int i = 1; i < permissionsNeeded.size(); i++)
+                    message = message + ", " + permissionsNeeded.get(i);
+                showMessageOKCancel(message,
+                        new DialogInterface.OnClickListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.M)
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
+                                        REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                            }
+                        });
+                return;
+            }
+            requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
+                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+            return;
+        }
+        startYourWork();
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(Birthdays.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private boolean addPermission(List<String> permissionsList, String permission) {
+        if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(permission);
+            // Check for Rationale Option
+            if (!shouldShowRequestPermissionRationale(permission))
+                return false;
+        }
+        return true;
+    }
+/*
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    startYourWork();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "RECEIVE_SMS Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+*/
 
     private Cursor getContactsBirthdays() {
         Uri uri = ContactsContract.Data.CONTENT_URI;
@@ -154,7 +172,10 @@ public class Birthdays extends AppCompatActivity {
         //return managedQuery
     }
 
-    private void getContactNames() {
+    protected void startYourWork() {
+        //sb.append("successful");
+
+        //textDetail.setText(sb);
         Cursor cursor = getContactsBirthdays();
         int bDayColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE);
         int nameColumn = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
@@ -187,6 +208,26 @@ public class Birthdays extends AppCompatActivity {
             sb.append("\n" + contactName.get(i) + "\n" + contactNumber.get(i) + "\n");
         }
         textDetail.setText(sb);
+
+
+
+        //String toPhoneNumber = toPhoneNumberET.getText().toString();
+        //String smsMessage = smsMessageET.getText().toString();
+        /*
+        String toPhoneNumber = "4804170094";
+        String smsMessage = "Happy Birthday!";
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(toPhoneNumber, null, smsMessage, null, null);
+            Toast.makeText(getApplicationContext(), "SMS sent.",
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),
+                    "Sending SMS failed.",
+                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+        */
     }
 
     public String getPhoneNumber(Context context, String name) {
@@ -202,5 +243,28 @@ public class Birthdays extends AppCompatActivity {
         if (ret == null)
             ret = "Unsaved";
         return ret;
+    }
+
+    protected void sendSMSMessage() {
+        //String toPhoneNumber = "4804170094";
+        String smsMessage = "Happy Birthday!";
+
+
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            //smsManager.sendTextMessage(toPhoneNumber, null, smsMessage, null, null);
+            //Toast.makeText(getApplicationContext(), "SMS sent.",Toast.LENGTH_LONG).show();
+            for (int i = 0; i < contactNumber.size(); i++) {
+                smsManager.sendTextMessage(contactNumber.get(i), null, smsMessage, null, null);
+                Toast.makeText(getApplicationContext(), "SMS sent.", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),
+                    "Sending SMS failed.",
+                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+
+
     }
 }
