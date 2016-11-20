@@ -63,6 +63,8 @@
         <activity
             android:name=".Birthdays"
             android:label="@string/birthdays_name" />
+        <activity android:name=".Settings"
+            android:label="Settings" />
 
 
         <receiver
