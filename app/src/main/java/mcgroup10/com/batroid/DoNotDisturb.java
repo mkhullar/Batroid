@@ -57,6 +57,14 @@ public class DoNotDisturb extends AppCompatActivity
         GoogleMap.OnMarkerClickListener,
         ResultCallback<Status> {
 
+    //Declaration of variables used for Database access
+    DatabaseHelper myDB;
+    String table_name = "geofence_records";
+    boolean saveGeofenceSuccess = false;
+    String dbFilePath;
+    TextView locationNameTextView;
+    String locationName="";
+
     private AudioManager myAudioManager;
 
     private ResponseReceiver receiver;
@@ -100,6 +108,9 @@ public class DoNotDisturb extends AppCompatActivity
 
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(receiver, broadcastFilter);
+
+        myDB = new DatabaseHelper(this);
+        myDB.createTable(table_name);
 
     }
 
@@ -151,6 +162,12 @@ public class DoNotDisturb extends AppCompatActivity
     public void stopGeoClick(View view){
         //Toast.makeText(getApplicationContext(), "Phone : Ring", Toast.LENGTH_SHORT).show();
         clearGeofence();
+        //myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+    }
+
+    public void saveGeofenceClick(View view){
+        //Toast.makeText(getApplicationContext(), "Phone : Ring", Toast.LENGTH_SHORT).show();
+        saveGeofenceinDB();
         //myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
     }
 
@@ -335,6 +352,28 @@ public class DoNotDisturb extends AppCompatActivity
             geoFenceMarker = map.addMarker(markerOptions);
 
         }
+    }
+
+    // Save Geofence in Database
+    private void saveGeofenceinDB() {
+        Log.i(TAG, "saveGeofenceinDB()");
+        locationNameTextView = (TextView) findViewById(R.id.editText);
+        if( geoFenceMarker != null ) {
+            locationName = locationNameTextView.getText().toString();
+            if(locationName != null && !locationName.isEmpty()) {
+                saveGeofenceSuccess = myDB.insertData(table_name, locationName, Double.toString(geoFenceMarker.getPosition().latitude), Double.toString(geoFenceMarker.getPosition().longitude));
+                if (saveGeofenceSuccess)
+                    Toast.makeText(getApplicationContext(), "Location saved successfully!", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getApplicationContext(), "Error in saving location.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Please enter name for location.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Log.e(TAG, "Geofence marker is null");
+            Toast.makeText(getApplicationContext(), "Please click on the map.", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     // Start Geofence creation process
