@@ -120,9 +120,7 @@ public class GeofenceTransitionService extends IntentService {
                 createNotification(msg, notificationPendingIntent));
 
     }
-
-
-
+    
 
     // Create notification
     private Notification createNotification(String msg, PendingIntent notificationPendingIntent) {

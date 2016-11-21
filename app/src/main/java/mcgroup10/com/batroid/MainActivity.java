@@ -29,6 +29,12 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        Intent intent = new Intent(this, GpsService.class);
+        startService(intent);
+        Intent intentSms = new Intent(this, SmsService.class);
+        startService(intentSms);
+        Intent intentAutoReply = new Intent(this, MyPhoneStateListener.class);
+        startService(intentAutoReply);
     }
 
     @Override
