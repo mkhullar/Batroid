@@ -21,6 +21,8 @@ import com.google.android.gms.location.GeofencingEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static mcgroup10.com.batroid.SmsReceiver.inGeoFence;
+
 //import android.os.ResultReceiver;
 
 /**
@@ -118,7 +120,11 @@ public class GeofenceTransitionService extends IntentService {
         notificatioMng.notify(
                 GEOFENCE_NOTIFICATION_ID,
                 createNotification(msg, notificationPendingIntent));
-
+        if(msg.contains("Entering")){
+            inGeoFence = true;}
+        else{
+            inGeoFence = false;
+        }
     }
     
 

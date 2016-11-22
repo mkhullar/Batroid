@@ -12,6 +12,8 @@ import android.telephony.gsm.SmsMessage;
 
 public class SmsReceiver extends BroadcastReceiver
 {
+
+    public static boolean inGeoFence = false;
     @Override
     public void onReceive(Context context, Intent intent)
     {
@@ -27,13 +29,11 @@ public class SmsReceiver extends BroadcastReceiver
             for (int i=0; i<msgs.length; i++){
                 msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
                 str += msgs[i].getOriginatingAddress();
-                //str += "SMS from " + msgs[i].getOriginatingAddress();
-                //str += " :";
-                //str += msgs[i].getMessageBody().toString();
-                //str += "\n";
+
             }
             //---display the new SMS message---
-            AutoReply.methodtocall(str);
+            if(inGeoFence)
+                AutoReply.methodtocall(str);
             //Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
         }
     }

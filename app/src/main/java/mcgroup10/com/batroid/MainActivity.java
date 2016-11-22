@@ -31,10 +31,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         Intent intent = new Intent(this, GpsService.class);
         startService(intent);
-        Intent intentSms = new Intent(this, SmsService.class);
-        startService(intentSms);
-        Intent intentAutoReply = new Intent(this, MyPhoneStateListener.class);
-        startService(intentAutoReply);
+        Intent all = new Intent(this, StartService.class);
+        startService(all);
     }
 
     @Override
