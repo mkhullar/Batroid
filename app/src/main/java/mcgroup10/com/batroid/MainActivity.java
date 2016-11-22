@@ -163,9 +163,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, Weather.class));
         } else if (id == R.id.nav_dnd) {
             startActivity(new Intent(this, DoNotDisturb.class));
-        } /*else if (id == R.id.nav_autosms) {
-            startActivity(new Intent(this, AutoReply.class));
-        } */else if (id == R.id.nav_birthday) {
+        } else if (id == R.id.nav_birthday) {
             startActivity(new Intent(this, Birthdays.class));
         } else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, Settings.class));

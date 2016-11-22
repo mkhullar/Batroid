@@ -68,8 +68,8 @@ public class DoNotDisturb extends AppCompatActivity
     private final int REQ_PERMISSION = 999;
     // Defined in mili seconds.
     // This number in extremely low, and should be used only for debug
-    private final int UPDATE_INTERVAL = 1000;
-    private final int FASTEST_INTERVAL = 900;
+    private final int UPDATE_INTERVAL = 2000;
+    private final int FASTEST_INTERVAL = 1800;
     private final int GEOFENCE_REQ_CODE = 0;
     //Declaration of variables used for Database access
     DatabaseHelper myDB;

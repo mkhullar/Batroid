@@ -67,10 +67,6 @@ public class GeofenceTransitionService extends IntentService {
         if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
                 geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
 
-
-            //}
-
-            // Get the geofence that were triggered
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
 
             geofenceTransitionDetails = getGeofenceTransitionDetails(geoFenceTransition, triggeringGeofences);
@@ -139,11 +135,10 @@ public class GeofenceTransitionService extends IntentService {
                 .setSmallIcon(R.drawable.batdroid)
                 .setColor(Color.RED)
                 .setContentTitle(msg)
-                .setContentText("Geofence Notification!")
+                .setContentText("GeoDND Notification!")
                 .setContentIntent(notificationPendingIntent)
                 .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND)
                 .setAutoCancel(true);
         return notificationBuilder.build();
     }
 }
-
