@@ -67,6 +67,7 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
                 }
                 Intent intent = getIntent();
                 finish();
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(intent);
             }
         });
