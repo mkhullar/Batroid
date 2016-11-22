@@ -75,7 +75,6 @@ public class WeatherUpdates extends AsyncTask<String, Void, String> {
             String line = null;
             while (  (line = br.readLine()) != null )
                 buffer.append(line + "\r\n");
-
             is.close();
             con.disconnect();
             return buffer.toString();
@@ -156,7 +155,6 @@ public class WeatherUpdates extends AsyncTask<String, Void, String> {
     }
     protected void onPostExecute(String data) {
         // TODO: check this.exception
-        // TODO: do something with the feed
         int cel = (int) (Double.parseDouble(temp) - 272.15);
         temp = ""+cel+" "+(char)0x00B0 +"C";
         tv.setText(temp);

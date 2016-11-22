@@ -101,8 +101,6 @@ public class Weather extends AppCompatActivity {
         if(gps.canGetLocation){
             Intent intent = new Intent(this,GpsService.class);
             startService(intent);
-            Intent intentSms = new Intent(this,SmsService.class);
-            startService(intentSms);
             Location location = gps.getLocation();
 
             if(location!=null){
@@ -111,13 +109,7 @@ public class Weather extends AppCompatActivity {
                 String city = gps.getAddress(location).get(0).getLocality();
                 TextView ed = (TextView) findViewById(R.id.Add);
                 ed.setText(address + ", " +city);
-                if(address.equals("9 South Stanley Place") && !smsSent){
-                    SmsService sms = new SmsService(this);
-                    sms.sendSMS("4804100219");
-                    smsSent = true;
-                }else if(!address.equals("9 South Stanley Place")){
-                    smsSent = false;
-                }
+
                 TextView cond = (TextView) findViewById(R.id.cond);
                 TextView temp = (TextView) findViewById(R.id.temp);
                 ImageView condIcon = (ImageView) findViewById(R.id.condIcon);
