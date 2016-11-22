@@ -166,6 +166,7 @@ public class DoNotDisturb extends AppCompatActivity
 
     public void stopGeoClick(View view) {
         clearGeofence();
+        myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
     }
 
     public void saveGeofenceClick(View view) {
