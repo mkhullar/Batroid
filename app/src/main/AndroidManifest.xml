@@ -15,7 +15,8 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.CALL_PHONE"/>
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <service
         android:name=".GpsService"
         android:enabled="true"
@@ -32,11 +33,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDeULE-hNvbqT4xVDCqe5AvMEIxhFRyqTg" />
-        <!--
-            meta-data
-            android:name="com.google.android.gms.version"
-            android:value="9080000" /
-        -->
+
 
         <activity
             android:name=".MainActivity"
@@ -65,7 +62,7 @@
             android:label="@string/birthdays_name" />
         <activity
             android:name=".Settings"
-            android:label="Settings" />
+            android:label="Geofence Settings" />
         <activity
             android:name=".About"
             android:label="About Batroid" />
@@ -84,24 +81,12 @@
             </intent-filter>
         </receiver>
 
-        <!--
-        receiver android:name=".DoNotDisturb$MyWebRequestReceiver" >
-            <intent-filter>
-                <action android:name="mcgroup10.com.batroid.intent.action.PROCESS_RESPONSE" />
-            </intent-filter>
-        </receiver
-        -->
-
         <receiver android:name=".DoNotDisturb$ResponseReceiver">
             <intent-filter>
                 <action android:name="mcgroup10.com.batroid.CUSTOM_INTENT"></action>
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".SmsService"
-            android:enabled="true"
-            android:exported="true"/>
     </application>
 
 </manifest>
