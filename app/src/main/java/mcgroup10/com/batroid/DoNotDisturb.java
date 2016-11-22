@@ -67,6 +67,7 @@ public class DoNotDisturb extends AppCompatActivity
     boolean saveGeofenceSuccess = false;
     TextView locationNameTextView;
     String locationName="";
+    String geofence_change_status="";
 
     private AudioManager myAudioManager;
 
@@ -103,8 +104,8 @@ public class DoNotDisturb extends AppCompatActivity
         // create GoogleApiClient
         createGoogleApi();
 
-        //final AudioManager mode = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        //myAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        final AudioManager mode = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        myAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
         IntentFilter broadcastFilter = new IntentFilter(ResponseReceiver.LOCAL_ACTION);
         receiver = new ResponseReceiver();
@@ -564,7 +565,13 @@ public class DoNotDisturb extends AppCompatActivity
         public static final String LOCAL_ACTION = "mcgroup10.com.batroid.CUSTOM_INTENT";
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, intent.getStringExtra("Status"), Toast.LENGTH_LONG).show();
+            geofence_change_status=intent.getStringExtra("Status");
+            Toast.makeText(context, geofence_change_status, Toast.LENGTH_LONG).show();
+
+            if (geofence_change_status.startsWith("Entering"))
+            myAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            if (geofence_change_status.startsWith("Exiting"))
+            myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         }
     }
 }
