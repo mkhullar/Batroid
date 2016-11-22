@@ -24,8 +24,6 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
     //Declaration of variables used for Database access
     DatabaseHelper myDB;
     String table_name = "geofence_records";
-    boolean dbCreated = false;
-    String dbFilePath;
     Button bt1;
     ArrayList<String> checkedValue;
 
@@ -71,29 +69,6 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
                 startActivity(intent);
             }
         });
-
-        //getValuesFromDB();
-    }
-
-    public void getValuesFromDB(){
-        Cursor res = myDB.getAllData(table_name);
-        while (res.moveToNext()) {
-            //values[i] = res.getLong(1);
-        }
-        res.close();
-
-    }
-
-    public void deleteGeofence(View view){
-        myDB = new DatabaseHelper(this);
-        for(int i=0 ; i< modelItems.length ; i++){
-            if (modelItems[i].value == 1)
-                Toast.makeText(getApplicationContext(), "Selected", Toast.LENGTH_SHORT).show();
-            else
-                Toast.makeText(getApplicationContext(), "Not selected", Toast.LENGTH_SHORT).show();
-        }
-
-        //Toast.makeText(getApplicationContext(), "Phone : Ring", Toast.LENGTH_SHORT).show();
 
     }
 

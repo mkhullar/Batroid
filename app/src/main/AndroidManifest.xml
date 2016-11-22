@@ -63,8 +63,12 @@
         <activity
             android:name=".Birthdays"
             android:label="@string/birthdays_name" />
-        <activity android:name=".Settings"
+        <activity
+            android:name=".Settings"
             android:label="Settings" />
+        <activity
+            android:name=".About"
+            android:label="About Batroid" />
 
 
         <receiver
