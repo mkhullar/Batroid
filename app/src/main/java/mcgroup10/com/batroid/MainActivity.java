@@ -125,9 +125,6 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                startActivity(new Intent(this, Settings.class));
-                return true;
             case R.id.action_about:
                 startActivity(new Intent(this, About.class));
                 return true;
@@ -153,6 +150,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, AutoReply.class));
         } else if (id == R.id.nav_birthday) {
             startActivity(new Intent(this, Birthdays.class));
+        } else if (id == R.id.nav_settings) {
+            startActivity(new Intent(this, Settings.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
