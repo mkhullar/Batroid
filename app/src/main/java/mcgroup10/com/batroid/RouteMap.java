@@ -137,9 +137,9 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
         mMap = googleMap;
         LatLng tempe = new LatLng(33.421673, -111.936050);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tempe, 18));
-        originMarkers.add(mMap.addMarker(new MarkerOptions()
+        /*originMarkers.add(mMap.addMarker(new MarkerOptions()
                 .title("Marker in ASU, Tempe, Arizona")
-                .position(tempe)));
+                .position(tempe)));*/
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
