@@ -79,14 +79,13 @@ public class CustomAdapter extends BaseAdapter {
         holder.ck1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (holder.ck1.isChecked()){
+                if (holder.ck1.isChecked()) {
                     itemChecked[position] = true;
                     Arr.add(holder.location.getText().toString());
-                }
-                else{
+                } else {
                     itemChecked[position] = false;
                     Arr.remove(holder.location.getText().toString());
-            }
+                }
             }
         });
 
@@ -95,51 +94,10 @@ public class CustomAdapter extends BaseAdapter {
 
     }
 
-    public ArrayList<String> getChecked(){
-       return Arr;
+    public ArrayList<String> getChecked() {
+        return Arr;
 
     }
 
 
 }
-
-
-/*public class    CustomAdapter extends ArrayAdapter {
-    Model[] modelItems = null;
-    Context context;
-
-    public CustomAdapter(Context context, Model[] resource) {
-        super(context, R.layout.row, resource);
-        this.context = context;
-        this.modelItems = resource;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-        convertView = inflater.inflate(R.layout.row, parent, false);
-        TextView name = (TextView) convertView.findViewById(R.id.textView1);
-        CheckBox cb = (CheckBox) convertView.findViewById(R.id.checkBox1);
-        name.setText(modelItems[position].getName());
-        if (modelItems[position].getValue() == 1)
-            cb.setChecked(true);
-        else
-            cb.setChecked(false);
-
-        Button btButton = (Button) convertView.findViewById(R.id.button4);
-        btButton.setTag(position);
-        btButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int position = (Integer) view.getTag();
-                // Access the row position here to get the correct data item
-                Toast.makeText(context, "Selected : " +  getItem(position), Toast.LENGTH_SHORT).show();
-                // Do what you want here...
-            }
-        });
-
-
-        return convertView;
-    }
-}
-*/

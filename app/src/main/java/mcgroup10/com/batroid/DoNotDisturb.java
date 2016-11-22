@@ -364,11 +364,11 @@ public class DoNotDisturb extends AppCompatActivity
         if( geoFenceMarker != null ) {
             locationName = locationNameTextView.getText().toString();
             if(locationName != null && !locationName.isEmpty()) {
-                saveGeofenceSuccess = myDB.insertData(table_name, locationName, Double.toString(geoFenceMarker.getPosition().latitude), Double.toString(geoFenceMarker.getPosition().longitude));
+                saveGeofenceSuccess = myDB.insertData(table_name, locationName.trim(), Double.toString(geoFenceMarker.getPosition().latitude), Double.toString(geoFenceMarker.getPosition().longitude));
                 if (saveGeofenceSuccess)
                     Toast.makeText(getApplicationContext(), "Location saved successfully!", Toast.LENGTH_SHORT).show();
                 else
-                    Toast.makeText(getApplicationContext(), "Error in saving location.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Location name already exists.", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getApplicationContext(), "Please enter name for location.", Toast.LENGTH_SHORT).show();
             }

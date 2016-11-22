@@ -42,7 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void createTable (String t_name){
         SQLiteDatabase db = this.getWritableDatabase();
         //db.execSQL("DROP TABLE IF EXISTS " + t_name);
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + t_name + " ( NAME VARCHAR2(10), LATITUDE VARCHAR2(10), LONGITUDE VARCHAR2(10))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + t_name + " ( NAME VARCHAR2(10) PRIMARY KEY, LATITUDE VARCHAR2(10), LONGITUDE VARCHAR2(10))");
     }
 
     //Method to retrieve geofences
@@ -50,6 +50,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("SELECT * FROM " + t_name, null);
         return res;
+    }
+
+    //Method to delete geofences
+    public void deleteGeofence (String t_name, String g_name){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + t_name + " WHERE NAME = '" + g_name + "'");
     }
 
     public int getRowCount(String t_name) {

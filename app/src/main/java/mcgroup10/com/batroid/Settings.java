@@ -1,5 +1,6 @@
 package mcgroup10.com.batroid;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -48,7 +49,7 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
         Cursor res = myDB.getAllData(table_name);
         while (res.moveToNext()) {
             //values[i] = res.getLong(1);
-            modelItems[i] = new Model(res.getString(0) + "," + res.getString(1) + ", " + res.getString(2), 0);
+            modelItems[i] = new Model(res.getString(0), 0);
             i++;
         }
         res.close();
@@ -59,9 +60,14 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
 
             @Override
             public void onClick(View v) {
-
                 ArrayList<String> arr = adapter.getChecked();
-                Toast.makeText(getApplicationContext(),"LOL : " + arr.toString(),Toast.LENGTH_LONG).show();
+                for (String key : arr){
+                    myDB.deleteGeofence(table_name, key);
+                    Toast.makeText(getApplicationContext(),"Deleted : " + key,Toast.LENGTH_SHORT).show();
+                }
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
             }
         });
 
