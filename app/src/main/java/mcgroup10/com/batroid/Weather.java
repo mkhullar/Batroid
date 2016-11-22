@@ -23,16 +23,11 @@ import android.widget.TextView;
 
 public class Weather extends AppCompatActivity {
 
-    protected LocationManager locationManager;
-    private Handler mHandler = new Handler();
-
-    Boolean smsSent = false;
-
     //check if enable GPS popup is active
     Boolean gpsClicked = false;
+    private Handler mHandler = new Handler();
 
     public Weather() {
-
     }
 
     @Override
@@ -43,9 +38,8 @@ public class Weather extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {} else {
-
-
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+            } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         1);
@@ -56,31 +50,30 @@ public class Weather extends AppCompatActivity {
                 Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.SEND_SMS)) {} else {
-
-
+                    Manifest.permission.SEND_SMS)) {
+            } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.SEND_SMS},
                         1);
             }
-    }
+        }
         GPSEnabled();
     }
 
-    public void RefreshLoc(View v){
+    public void RefreshLoc(View v) {
         GPSEnabled();
     }
 
     public void GPSEnabled() {
-        final int One_Min = 5000*12;
+        final int One_Min = 5000 * 12;
         final GpsService gps = new GpsService(this);
         mHandler.postDelayed(new Runnable() {
             public void run() {
                 LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                if(!statusOfGPS && !gpsClicked){
+                if (!statusOfGPS && !gpsClicked) {
                     showDialogGPS();
-                }else {
+                } else {
                     getGPSLocation();
                 }
                 mHandler.postDelayed(this, One_Min);
@@ -88,35 +81,36 @@ public class Weather extends AppCompatActivity {
         }, One_Min);
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if(!statusOfGPS && !gpsClicked){
+        if (!statusOfGPS && !gpsClicked) {
             showDialogGPS();
-        }else {
+        } else {
             getGPSLocation();
         }
     }
 
 
-    public void getGPSLocation(){
+    public void getGPSLocation() {
         GpsService gps = new GpsService(this);
-        if(gps.canGetLocation){
-            Intent intent = new Intent(this,GpsService.class);
+        if (gps.canGetLocation) {
+            Intent intent = new Intent(this, GpsService.class);
             startService(intent);
             Location location = gps.getLocation();
 
-            if(location!=null){
+            if (location != null) {
                 String address = gps.getAddress(location).get(0).getAddressLine(0);
-                String postalCode =gps.getAddress(location).get(0).getPostalCode();
+                String postalCode = gps.getAddress(location).get(0).getPostalCode();
                 String city = gps.getAddress(location).get(0).getLocality();
                 TextView ed = (TextView) findViewById(R.id.Add);
-                ed.setText(address + ", " +city);
+                ed.setText(address + ", " + city);
 
                 TextView cond = (TextView) findViewById(R.id.cond);
                 TextView temp = (TextView) findViewById(R.id.temp);
                 ImageView condIcon = (ImageView) findViewById(R.id.condIcon);
-                new WeatherUpdates(this,temp,condIcon,cond).execute(postalCode);
+                new WeatherUpdates(this, temp, condIcon, cond).execute(postalCode);
             }
         }
     }
+
     /**
      * Show a dialog to the user requesting that GPS be enabled
      */

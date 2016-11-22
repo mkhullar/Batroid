@@ -22,15 +22,10 @@ public class CustomAdapter extends BaseAdapter {
     ArrayList<String> Arr = new ArrayList<String>();
 
     public CustomAdapter(Activity context, Model[] resource) {
-        super();//context, R.layout.row, resource);
+        super();
         this.context = context;
         this.modelItems = resource;
         itemChecked = new boolean[modelItems.length];
-    }
-
-    private class ViewHolder {
-        TextView location;
-        CheckBox ck1;
     }
 
     public int getCount() {
@@ -46,7 +41,6 @@ public class CustomAdapter extends BaseAdapter {
     public long getItemId(int position) {
         return 0;
     }
-
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -90,8 +84,6 @@ public class CustomAdapter extends BaseAdapter {
         });
 
         return convertView;
-
-
     }
 
     public ArrayList<String> getChecked() {
@@ -99,5 +91,8 @@ public class CustomAdapter extends BaseAdapter {
 
     }
 
-
+    private class ViewHolder {
+        TextView location;
+        CheckBox ck1;
+    }
 }

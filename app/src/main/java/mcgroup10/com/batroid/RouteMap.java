@@ -24,8 +24,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,28 +44,35 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import it.macisamuele.calendarprovider.*;
+import it.macisamuele.calendarprovider.EventInfo;
 import mcgroup10.com.batroid.Modules.DirectionFinder;
 import mcgroup10.com.batroid.Modules.DirectionFinderListener;
 import mcgroup10.com.batroid.Modules.Route;
 
 public class RouteMap extends FragmentActivity implements OnMapReadyCallback, DirectionFinderListener {
 
+    public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 0;
+    Boolean gpsClicked = false;
+    Boolean showedRoute = false;
     private GoogleMap mMap;
-    private Button btnFindPath;
-    private EditText etOrigin;
-    private EditText etDestination;
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ProgressDialog progressDialog;
-
-    public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 0;
-
-    protected LocationManager locationManager;
     private Handler mHandler = new Handler();
-    Boolean gpsClicked = false;
-    Boolean showedRoute = false;
+
+    public static Date getEnd(Date date) {
+        if (date == null) {
+            return null;
+        }
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.HOUR_OF_DAY, 23);
+        c.set(Calendar.MINUTE, 59);
+        c.set(Calendar.SECOND, 59);
+        c.set(Calendar.MILLISECOND, 999);
+        return c.getTime();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,12 +109,12 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {} else {
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+            } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         1);
             }
-
         }
 
         GPSEnabled();
@@ -117,11 +122,9 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
 
     private void sendRequest(String ori, String dest) {
         if (ori.isEmpty()) {
-            //Toast.makeText(this, "Please enter origin address!", Toast.LENGTH_SHORT).show();
             return;
         }
         if (dest.isEmpty()) {
-            //Toast.makeText(this, "Please enter destination address!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -137,9 +140,6 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
         mMap = googleMap;
         LatLng tempe = new LatLng(33.421673, -111.936050);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tempe, 18));
-        /*originMarkers.add(mMap.addMarker(new MarkerOptions()
-                .title("Marker in ASU, Tempe, Arizona")
-                .position(tempe)));*/
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -147,7 +147,6 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
         }
         mMap.setMyLocationEnabled(true);
     }
-
 
     @Override
     public void onDirectionFinderStart() {
@@ -167,7 +166,7 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
         }
 
         if (polylinePaths != null) {
-            for (Polyline polyline:polylinePaths ) {
+            for (Polyline polyline : polylinePaths) {
                 polyline.remove();
             }
         }
@@ -208,14 +207,13 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
 
     public void GPSEnabled() {
         final int FIVE_SECONDS = 5000;
-        final GpsService gps = new GpsService(this);
         mHandler.postDelayed(new Runnable() {
             public void run() {
                 LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                if(!statusOfGPS && !gpsClicked){
+                if (!statusOfGPS && !gpsClicked) {
                     showDialogGPS();
-                }else {
+                } else {
                     getGPSLocation();
                 }
                 mHandler.postDelayed(this, FIVE_SECONDS);
@@ -223,25 +221,24 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
         }, FIVE_SECONDS);
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if(!statusOfGPS && !gpsClicked){
+        if (!statusOfGPS && !gpsClicked) {
             showDialogGPS();
-        }else {
+        } else {
             getGPSLocation();
         }
     }
 
-    public void getGPSLocation(){
+    public void getGPSLocation() {
         GpsService gps = new GpsService(this);
-        if(gps.canGetLocation){
-            Intent intent = new Intent(this,GpsService.class);
+        if (gps.canGetLocation) {
+            Intent intent = new Intent(this, GpsService.class);
             startService(intent);
             Location location = gps.getLocation();
 
-            if(location!=null){
-                if(!showedRoute)
-                {
+            if (location != null) {
+                if (!showedRoute) {
                     String address = gps.getAddress(location).get(0).getAddressLine(0);
-                    String postalCode =gps.getAddress(location).get(0).getPostalCode();
+                    String postalCode = gps.getAddress(location).get(0).getPostalCode();
                     final String _origin = address; // get from current location
                     Date today = new Date();
                     Date fromDate = new Date();
@@ -255,15 +252,14 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
                     String event_description = null;
                     Date fromCalendar = null;
                     int count = 0;
-                    for(EventInfo eventInfo: EventInfo.getEvents(this,fromDate,toDate,null,null)) {
+                    for (EventInfo eventInfo : EventInfo.getEvents(this, fromDate, toDate, null, null)) {
                         temp_location = eventInfo.getLocation();
                         fromCalendar = eventInfo.getStartDate();
                         event_title = eventInfo.getTitle();
                         Log.d("events", "location is " + temp_location);
                         Log.d("MainActivity - Events", eventInfo.toString());
                         count++;
-                        if(count >= 1)
-                        {
+                        if (count >= 1) {
                             break;
                         }
                     }
@@ -274,16 +270,15 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
                             .findFragmentById(R.id.map);
                     mapFragment.getMapAsync(this);
 
-                    if(fromCalendar == null)
-                    {
+                    if (fromCalendar == null) {
                         Toast.makeText(this, "There are no events in calendar for today!", Toast.LENGTH_LONG).show();
                     }
 
-                    if(fromCalendar != null && fromCalendar.before(toDate) == true){
+                    if (fromCalendar != null && fromCalendar.before(toDate) == true) {
                         //Do Action
                         sendRequest(_origin, _destination);
 
-                        final int MY_NOTIFICATION_ID=1;
+                        final int MY_NOTIFICATION_ID = 1;
                         NotificationManager notificationManager;
                         Notification myNotification;
 
@@ -306,7 +301,7 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
                                 .build();
 
                         notificationManager =
-                                (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+                                (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
                         notificationManager.notify(MY_NOTIFICATION_ID, myNotification);
                     }
                     showedRoute = true;
@@ -314,6 +309,7 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
             }
         }
     }
+
     /**
      * Show a dialog to the user requesting that GPS be enabled
      */
@@ -330,30 +326,15 @@ public class RouteMap extends FragmentActivity implements OnMapReadyCallback, Di
                         new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                 dialog.dismiss();
                 gpsClicked = false;
-                //GPSEnabled();
             }
         });
         builder.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 gpsClicked = false;
-                //GPSEnabled();
             }
         });
         AlertDialog alert = builder.create();
         alert.show();
-    }
-
-    public static Date getEnd(Date date) {
-        if (date == null) {
-            return null;
-        }
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.set(Calendar.HOUR_OF_DAY, 23);
-        c.set(Calendar.MINUTE, 59);
-        c.set(Calendar.SECOND, 59);
-        c.set(Calendar.MILLISECOND, 999);
-        return c.getTime();
     }
 }

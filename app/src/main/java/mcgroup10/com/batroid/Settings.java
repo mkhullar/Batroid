@@ -27,7 +27,7 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
     Button bt1;
     ArrayList<String> checkedValue;
 
-    int i=0;
+    int i = 0;
     ListView lv;
     Model[] modelItems;
 
@@ -35,7 +35,6 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.action_settings);
-
 
         myDB = new DatabaseHelper(this);
 
@@ -46,7 +45,6 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
         modelItems = new Model[profile_counts];
         Cursor res = myDB.getAllData(table_name);
         while (res.moveToNext()) {
-            //values[i] = res.getLong(1);
             modelItems[i] = new Model(res.getString(0), 0);
             i++;
         }
@@ -59,9 +57,9 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
             @Override
             public void onClick(View v) {
                 ArrayList<String> arr = adapter.getChecked();
-                for (String key : arr){
+                for (String key : arr) {
                     myDB.deleteGeofence(table_name, key);
-                    Toast.makeText(getApplicationContext(),"Deleted : " + key,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Deleted : " + key, Toast.LENGTH_SHORT).show();
                 }
                 Intent intent = getIntent();
                 finish();
@@ -69,7 +67,6 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
                 startActivity(intent);
             }
         });
-
     }
 
     @Override
@@ -83,9 +80,6 @@ public class Settings extends AppCompatActivity implements OnItemClickListener {
         } else if (!cb.isChecked()) {
             checkedValue.remove(tv.getText().toString());
         }
-
-
-
     }
 
 }

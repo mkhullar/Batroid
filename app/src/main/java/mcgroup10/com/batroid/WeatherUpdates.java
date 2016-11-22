@@ -1,9 +1,5 @@
 package mcgroup10.com.batroid;
 
-/**
- * Created by mayankkhullar on 11/14/16.
- */
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -25,7 +21,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-
 /**
  * Created by mayankkhullar on 11/12/16.
  */
@@ -34,8 +29,6 @@ public class WeatherUpdates extends AsyncTask<String, Void, String> {
 
     private static String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?appid=dc9817ae766f0fca56bdc5c24b4ad927&zip=";
     private static String IMG_URL = "http://openweathermap.org/img/w/";
-
-    private Context mContext;
     String temp = null;
     String desc = null;
     float sunset;
@@ -43,24 +36,31 @@ public class WeatherUpdates extends AsyncTask<String, Void, String> {
     TextView tv;
     TextView cond;
     ImageView iv;
+    private Context mContext;
 
-    public WeatherUpdates(){
+    public WeatherUpdates() {
 
     }
 
-    public WeatherUpdates(Context context, TextView temp, ImageView condIcon,TextView cond){
+    public WeatherUpdates(Context context, TextView temp, ImageView condIcon, TextView cond) {
         this.mContext = context;
         this.tv = temp;
         this.iv = condIcon;
         this.cond = cond;
     }
 
+    //Weather Updates
+    private static JSONObject getObject(String tagName, JSONObject jObj) throws JSONException {
+        JSONObject subObj = jObj.getJSONObject(tagName);
+        return subObj;
+    }
+
     public String getWeatherData(String location) {
-        HttpURLConnection con = null ;
+        HttpURLConnection con = null;
         InputStream is = null;
 
         try {
-            con = (HttpURLConnection) ( new URL(BASE_URL + location)).openConnection();
+            con = (HttpURLConnection) (new URL(BASE_URL + location)).openConnection();
             con.setRequestMethod("POST");
             con.setReadTimeout(10000); // millis
             con.setConnectTimeout(15000); // millis
@@ -73,29 +73,32 @@ public class WeatherUpdates extends AsyncTask<String, Void, String> {
             is = con.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line = null;
-            while (  (line = br.readLine()) != null )
+            while ((line = br.readLine()) != null)
                 buffer.append(line + "\r\n");
             is.close();
             con.disconnect();
             return buffer.toString();
-        }
-        catch(Exception e) {
-            Log.d("Error",e.toString());
-        }
-        finally {
-            try { is.close(); } catch(Throwable t) {}
-            try { con.disconnect(); } catch(Throwable t) {}
+        } catch (Exception e) {
+            Log.d("Error", e.toString());
+        } finally {
+            try {
+                is.close();
+            } catch (Throwable t) {
+            }
+            try {
+                con.disconnect();
+            } catch (Throwable t) {
+            }
         }
 
         return null;
-
     }
 
     public byte[] getImage(String code) {
-        HttpURLConnection con = null ;
+        HttpURLConnection con = null;
         InputStream is = null;
         try {
-            con = (HttpURLConnection) ( new URL(IMG_URL + code)).openConnection();
+            con = (HttpURLConnection) (new URL(IMG_URL + code)).openConnection();
             con.setRequestMethod("POST");
             con.setReadTimeout(10000); // millis
             con.setConnectTimeout(15000); // millis
@@ -108,34 +111,34 @@ public class WeatherUpdates extends AsyncTask<String, Void, String> {
             byte[] buffer = new byte[1024];
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            while ( is.read(buffer) != -1)
+            while (is.read(buffer) != -1)
                 baos.write(buffer);
 
             return baos.toByteArray();
-        }
-        catch(Exception e) {
-            Log.d("Error",e.toString());
-        }
-        finally {
-            try { is.close(); } catch(Throwable t) {}
-            try { con.disconnect(); } catch(Throwable t) {}
+        } catch (Exception e) {
+            Log.d("Error", e.toString());
+        } finally {
+            try {
+                is.close();
+            } catch (Throwable t) {
+            }
+            try {
+                con.disconnect();
+            } catch (Throwable t) {
+            }
         }
 
         return null;
 
     }
-    //Weather Updates
-    private static JSONObject getObject(String tagName, JSONObject jObj) throws JSONException {
-        JSONObject subObj = jObj.getJSONObject(tagName);
-        return subObj;
-    }
+
     public void updateWeather(String data) {
 
         JSONObject jObj = null;
         try {
             jObj = new JSONObject(data);
             JSONObject mainObj = getObject("main", jObj);
-            temp =  mainObj.getString("temp");
+            temp = mainObj.getString("temp");
             JSONArray weatherArr = jObj.getJSONArray("weather");
             JSONObject JSONWeather = weatherArr.getJSONObject(0);
             desc = JSONWeather.getString("description");
@@ -153,28 +156,29 @@ public class WeatherUpdates extends AsyncTask<String, Void, String> {
         updateWeather(getWeatherData(zip[0]));
         return null;
     }
+
     protected void onPostExecute(String data) {
         // TODO: check this.exception
         int cel = (int) (Double.parseDouble(temp) - 272.15);
-        temp = ""+cel+" "+(char)0x00B0 +"C";
+        temp = "" + cel + " " + (char) 0x00B0 + "C";
         tv.setText(temp);
-        Long tsLong = System.currentTimeMillis()/1000;
+        Long tsLong = System.currentTimeMillis() / 1000;
         String ts = tsLong.toString();
         float fTs = Float.parseFloat(ts);
         Drawable myDrawable = mContext.getDrawable(R.drawable.clear_day);
-        if(fTs<sunrise || fTs>sunset){
+        if (fTs < sunrise || fTs > sunset) {
             myDrawable = mContext.getDrawable(R.drawable.clear_night);
         }
         iv.setImageDrawable(myDrawable);
         cond.setText(desc);
-        if(desc.contains("rain"))
+        if (desc.contains("rain"))
             sendNotification();
     }
 
-    public void sendNotification(){
+    public void sendNotification() {
         NotificationManager notificationManager =
                 (NotificationManager) mContext.getSystemService(Service.NOTIFICATION_SERVICE);
-        Notification notify=new Notification.Builder
+        Notification notify = new Notification.Builder
                 (mContext).setContentTitle(desc).setContentText("Take out your Umbrellas").
                 setContentTitle(desc).setSmallIcon(R.drawable.clear_day).build();
 

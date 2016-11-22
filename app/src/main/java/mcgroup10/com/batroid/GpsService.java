@@ -18,35 +18,28 @@ import java.util.Locale;
 
 
 public class GpsService extends Service implements LocationListener {
-    private Context mContext = null;
-
+    // The minimum distance to change Updates in meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
+    // The minimum time between updates in milliseconds
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
+    // Declaring a Location Manager
+    protected LocationManager locationManager;
     // flag for GPS status
     boolean isGPSEnabled = false;
-
     // flag for network status
     boolean isNetworkEnabled = false;
-
     // flag for GPS status
     boolean canGetLocation = false;
-
     Location location; // location
     double latitude; // latitude
     double longitude; // longitude
+    private Context mContext = null;
 
-    // The minimum distance to change Updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
-
-    // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
-
-    // Declaring a Location Manager
-    protected LocationManager locationManager;
-
-    public GpsService(){
+    public GpsService() {
 
     }
 
-    public GpsService(Context context){
+    public GpsService(Context context) {
         this.mContext = context;
         getLocation();
     }
@@ -66,9 +59,9 @@ public class GpsService extends Service implements LocationListener {
 
             if (!isGPSEnabled && !isNetworkEnabled) {
                 // no network provider is enabled
-                Toast.makeText(mContext,"Disabled both", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "Disabled both", Toast.LENGTH_LONG).show();
             } else {
-                try{
+                try {
                     this.canGetLocation = true;
                     // First get location from Network Provider
                     if (isNetworkEnabled) {
@@ -104,14 +97,14 @@ public class GpsService extends Service implements LocationListener {
                         }
                     }
                 } catch (SecurityException e) {
-                    Toast.makeText(this,"Problem", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Problem", Toast.LENGTH_LONG).show();
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(location!=null){
+        if (location != null) {
             getAddress(location);
         }
         return location;
@@ -127,10 +120,11 @@ public class GpsService extends Service implements LocationListener {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             return addresses;
         }
     }
+
     @Override
     public void onLocationChanged(Location location) {
 
@@ -153,20 +147,19 @@ public class GpsService extends Service implements LocationListener {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId){
+    public int onStartCommand(Intent intent, int flags, int startId) {
 
         return START_STICKY;
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
 
         super.onDestroy();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
         return null;
     }
 }

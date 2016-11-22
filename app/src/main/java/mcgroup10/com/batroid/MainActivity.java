@@ -22,12 +22,30 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int REQ_PERMISSION = 124;
+    private static String[] PERMISSIONS_LIST = {
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.WRITE_CONTACTS,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.READ_CALENDAR,
+            Manifest.permission.WRITE_CALENDAR,
+    };
     DatabaseHelper myDB;
     String table_name = "geofence_records";
-
-    private Handler mHandler = new Handler();
     //check if enable GPS popup is active
     Boolean gpsClicked = false;
+    private Handler mHandler = new Handler();
+
+    public static void checkPermissions(Activity activity) {
+        ActivityCompat.requestPermissions(
+                activity,
+                PERMISSIONS_LIST,
+                REQ_PERMISSION
+        );
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +80,7 @@ public class MainActivity extends AppCompatActivity
             public void run() {
                 LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                if(!statusOfGPS && !gpsClicked){
+                if (!statusOfGPS && !gpsClicked) {
                     showDialogGPS();
                 }
                 mHandler.postDelayed(this, FIVE_SEC);
@@ -70,10 +88,11 @@ public class MainActivity extends AppCompatActivity
         }, FIVE_SEC);
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if(!statusOfGPS && !gpsClicked){
+        if (!statusOfGPS && !gpsClicked) {
             showDialogGPS();
         }
     }
+
     /**
      * Show a dialog to the user requesting that GPS be enabled
      */
@@ -114,16 +133,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_about:
                 startActivity(new Intent(this, About.class));
@@ -137,7 +152,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-
         int id = item.getItemId();
 
         if (id == R.id.nav_route) {
@@ -158,35 +172,6 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-    private static final int REQ_PERMISSION = 124;
-
-    private static String[] PERMISSIONS_LIST = {
-            Manifest.permission.SEND_SMS,
-            Manifest.permission.RECEIVE_SMS,
-            Manifest.permission.READ_CONTACTS,
-            Manifest.permission.WRITE_CONTACTS,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.RECEIVE_SMS,
-            Manifest.permission.READ_CALENDAR,
-            Manifest.permission.WRITE_CALENDAR,
-    };
-
-    public static void checkPermissions(Activity activity) {
-        // Check if we have write permission
-        //int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        //if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_LIST,
-                    REQ_PERMISSION
-            );
-        //}
-    }
-
-
 
 
 }
