@@ -165,22 +165,39 @@ public class WeatherUpdates extends AsyncTask<String, Void, String> {
         Long tsLong = System.currentTimeMillis() / 1000;
         String ts = tsLong.toString();
         float fTs = Float.parseFloat(ts);
-        Drawable myDrawable = mContext.getDrawable(R.drawable.clear_day);
-        if (fTs < sunrise || fTs > sunset) {
-            myDrawable = mContext.getDrawable(R.drawable.clear_night);
+        int ID = R.drawable.clear_day;
+        if(fTs<sunrise || fTs>sunset){
+            ID = R.drawable.clear_night;
+       
         }
+
+        if (desc.contains("rain"))
+            ID=R.drawable.rain;
+        if (desc.contains("thunderstorm"))
+            ID = R.drawable.thunderstorm;
+        if (desc.contains("snow"))
+            ID = R.drawable.snow;
+
+        Drawable myDrawable = mContext.getDrawable(ID);
         iv.setImageDrawable(myDrawable);
         cond.setText(desc);
-        if (desc.contains("rain"))
-            sendNotification();
+        if(desc.contains("rain") || desc.contains("thunderstorm") || desc.contains("snow"))
+            sendNotification(desc);
     }
 
-    public void sendNotification() {
+    public void sendNotification(String desc){
+        int ID = R.drawable.rain;
+
+        if (desc.contains("thunderstorm"))
+            ID = R.drawable.thunderstorm;
+        if (desc.contains("snow"))
+            ID = R.drawable.snow;
+
         NotificationManager notificationManager =
                 (NotificationManager) mContext.getSystemService(Service.NOTIFICATION_SERVICE);
-        Notification notify = new Notification.Builder
-                (mContext).setContentTitle(desc).setContentText("Take out your Umbrellas").
-                setContentTitle(desc).setSmallIcon(R.drawable.clear_day).build();
+        Notification notify=new Notification.Builder
+                (mContext).setContentTitle(desc).setContentText("Get ready for some fun").
+                setContentTitle(desc).setSmallIcon(ID).build();
 
         notify.flags |= Notification.FLAG_AUTO_CANCEL;
         notificationManager.notify(0, notify);

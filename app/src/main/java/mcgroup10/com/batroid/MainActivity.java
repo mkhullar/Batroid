@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity
             Manifest.permission.RECEIVE_SMS,
             Manifest.permission.READ_CALENDAR,
             Manifest.permission.WRITE_CALENDAR,
+			Manifest.permission.CALL_PHONE,
     };
     DatabaseHelper myDB;
     String table_name = "geofence_records";

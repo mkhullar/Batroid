@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
-
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
 
     <service
         android:name=".GpsService"
@@ -70,7 +70,11 @@
             android:name=".About"
             android:label="About Batroid" />
 
-
+        <receiver android:name=".PhoneCallReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".SmsReceiver"
             android:enabled="true"

@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.List;
@@ -59,7 +60,8 @@ public class GpsService extends Service implements LocationListener {
 
             if (!isGPSEnabled && !isNetworkEnabled) {
                 // no network provider is enabled
-                Toast.makeText(mContext, "Disabled both", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext,"Please enable GPS", Toast.LENGTH_LONG).show();
+
             } else {
                 try {
                     this.canGetLocation = true;
@@ -142,9 +144,11 @@ public class GpsService extends Service implements LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
-        Intent dialogIntent = new Intent(mContext, MainActivity.class);
-        startActivity(dialogIntent);
+            //Toast.makeText(mContext, "GPS is off", Toast.LENGTH_LONG).show();
+            //startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            Log.i("lm_disabled",provider);
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
