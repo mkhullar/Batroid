@@ -90,11 +90,11 @@ public class GeofenceTransitionService extends IntentService {
 
         String status = null;
         if ( geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ) {
-            status = "Entering ";
+            status = "Entering " + triggeringGeofencesList;
 
         }
         else if ( geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT ) {
-            status = "Exiting ";
+            status = "Exiting " + triggeringGeofencesList;
 
         }
         return status + TextUtils.join( ", ", triggeringGeofencesList);

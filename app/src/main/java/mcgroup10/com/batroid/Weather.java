@@ -68,7 +68,7 @@ public class Weather extends AppCompatActivity {
     }
 
     public void RefreshLoc(View v){
-        getGPSLocation();
+        GPSEnabled();
     }
 
     public void GPSEnabled() {

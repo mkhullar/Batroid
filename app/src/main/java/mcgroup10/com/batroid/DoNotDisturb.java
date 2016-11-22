@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
 import android.media.AudioManager;
@@ -43,6 +44,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import static mcgroup10.com.batroid.R.id.lat;
+import static mcgroup10.com.batroid.R.id.lon;
+
 /**
  * Created by abhishekzambre on 13/11/16.
  */
@@ -61,7 +65,6 @@ public class DoNotDisturb extends AppCompatActivity
     DatabaseHelper myDB;
     String table_name = "geofence_records";
     boolean saveGeofenceSuccess = false;
-    String dbFilePath;
     TextView locationNameTextView;
     String locationName="";
 
@@ -91,8 +94,8 @@ public class DoNotDisturb extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dnd);
-        textLat = (TextView) findViewById(R.id.lat);
-        textLong = (TextView) findViewById(R.id.lon);
+        textLat = (TextView) findViewById(lat);
+        textLong = (TextView) findViewById(lon);
 
         // initialize GoogleMaps
         initGMaps();
@@ -379,13 +382,24 @@ public class DoNotDisturb extends AppCompatActivity
     // Start Geofence creation process
     private void startGeofence() {
         Log.i(TAG, "startGeofence()");
-        if( geoFenceMarker != null ) {
+        Cursor res = myDB.getAllData(table_name);
+        Geofence geofence;
+        LatLng latLng;
+        while (res.moveToNext()) {
+            latLng = new LatLng( Double.parseDouble(res.getString(1)), Double.parseDouble(res.getString(2)));
+            geofence = createGeofence( latLng , GEOFENCE_RADIUS, res.getString(0) );
+            GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
+            addGeofence( geofenceRequest );
+        }
+        res.close();
+
+        /*if( geoFenceMarker != null ) {
             Geofence geofence = createGeofence( geoFenceMarker.getPosition(), GEOFENCE_RADIUS );
             GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
             addGeofence( geofenceRequest );
         } else {
             Log.e(TAG, "Geofence marker is null");
-        }
+        }*/
     }
 
     private static final long GEO_DURATION = 60 * 60 * 1000;
@@ -393,10 +407,10 @@ public class DoNotDisturb extends AppCompatActivity
     private static final float GEOFENCE_RADIUS = 20.0f; // in meters
 
     // Create a Geofence
-    private Geofence createGeofence( LatLng latLng, float radius ) {
+    private Geofence createGeofence( LatLng latLng, float radius, String name ) {
         Log.d(TAG, "createGeofence");
         return new Geofence.Builder()
-                .setRequestId(GEOFENCE_REQ_ID)
+                .setRequestId(name)
                 .setCircularRegion( latLng.latitude, latLng.longitude, radius)
                 .setExpirationDuration( GEO_DURATION )
                 .setTransitionTypes( Geofence.GEOFENCE_TRANSITION_ENTER
@@ -454,7 +468,27 @@ public class DoNotDisturb extends AppCompatActivity
     private void drawGeofence() {
         Log.d(TAG, "drawGeofence()");
 
-        if ( geoFenceLimits != null )
+        CircleOptions circleOptions;
+        //geoFenceLimits.remove();
+
+        Cursor res = myDB.getAllData(table_name);
+        LatLng latLng;
+        while (res.moveToNext()) {
+            latLng = new LatLng( Double.parseDouble(res.getString(1)), Double.parseDouble(res.getString(2)));
+            circleOptions = new CircleOptions()
+                    .center( latLng )
+                    .strokeColor(Color.argb(50, 70,70,70))
+                    .fillColor( Color.argb(100, 150,150,150) )
+                    .radius( GEOFENCE_RADIUS );
+            geoFenceLimits = map.addCircle( circleOptions );
+            //geofence = createGeofence( latLng , GEOFENCE_RADIUS );
+            //GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
+            //addGeofence( geofenceRequest );
+        }
+        res.close();
+
+
+        /*if ( geoFenceLimits != null )
             geoFenceLimits.remove();
 
         CircleOptions circleOptions = new CircleOptions()
@@ -462,7 +496,7 @@ public class DoNotDisturb extends AppCompatActivity
                 .strokeColor(Color.argb(50, 70,70,70))
                 .fillColor( Color.argb(100, 150,150,150) )
                 .radius( GEOFENCE_RADIUS );
-        geoFenceLimits = map.addCircle( circleOptions );
+        geoFenceLimits = map.addCircle( circleOptions );*/
     }
 
     private final String KEY_GEOFENCE_LAT = "GEOFENCE LATITUDE";
@@ -474,9 +508,9 @@ public class DoNotDisturb extends AppCompatActivity
         SharedPreferences sharedPref = getPreferences( Context.MODE_PRIVATE );
         SharedPreferences.Editor editor = sharedPref.edit();
 
-        editor.putLong( KEY_GEOFENCE_LAT, Double.doubleToRawLongBits( geoFenceMarker.getPosition().latitude ));
-        editor.putLong( KEY_GEOFENCE_LON, Double.doubleToRawLongBits( geoFenceMarker.getPosition().longitude ));
-        editor.apply();
+        //editor.putLong( KEY_GEOFENCE_LAT, Double.doubleToRawLongBits( geoFenceMarker.getPosition().latitude ));
+        //editor.putLong( KEY_GEOFENCE_LON, Double.doubleToRawLongBits( geoFenceMarker.getPosition().longitude ));
+        //editor.apply();
     }
 
     // Recovering last Geofence marker
@@ -516,6 +550,7 @@ public class DoNotDisturb extends AppCompatActivity
             geoFenceMarker.remove();
         if ( geoFenceLimits != null )
             geoFenceLimits.remove();
+        map.clear();
     }
 
     @Override
@@ -529,7 +564,7 @@ public class DoNotDisturb extends AppCompatActivity
         public static final String LOCAL_ACTION = "mcgroup10.com.batroid.CUSTOM_INTENT";
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Intent Detected : " + intent.getStringExtra("Status"), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, intent.getStringExtra("Status"), Toast.LENGTH_LONG).show();
         }
     }
 }
