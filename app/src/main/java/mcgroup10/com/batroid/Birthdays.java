@@ -1,17 +1,11 @@
 package mcgroup10.com.batroid;
 
-import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -24,10 +18,9 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
- * Created by abhishekzambre on 13/11/16.
+ * Created by murali on 13/11/16.
  */
 
 public class Birthdays extends AppCompatActivity {
@@ -48,19 +41,21 @@ public class Birthdays extends AppCompatActivity {
     ArrayList<String> contactNumber = new ArrayList<String>();
     StringBuffer sb = new StringBuffer();
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    //@RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_birthdays);
         textDetail = (TextView) findViewById(R.id.textView1);
         sendBtn = (Button) findViewById(R.id.btnSendSMS);
-        checkReceivePermission();
+        //checkReceivePermission();
+        startYourWork();
         sendBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 sendSMSMessage();
             }
         });
+
     }
 
     /*
@@ -76,7 +71,7 @@ public class Birthdays extends AppCompatActivity {
     }
     */
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+   /* @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkReceivePermission() {
         List<String> permissionsNeeded = new ArrayList<String>();
 
@@ -112,7 +107,7 @@ public class Birthdays extends AppCompatActivity {
         startYourWork();
     }
 
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+    /*private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(Birthdays.this)
                 .setMessage(message)
                 .setPositiveButton("OK", okListener)
@@ -131,7 +126,7 @@ public class Birthdays extends AppCompatActivity {
         }
         return true;
     }
-/*
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {

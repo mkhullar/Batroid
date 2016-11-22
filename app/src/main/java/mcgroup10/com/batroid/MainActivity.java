@@ -2,13 +2,18 @@ package mcgroup10.com.batroid;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -20,6 +25,10 @@ public class MainActivity extends AppCompatActivity
     DatabaseHelper myDB;
     String table_name = "geofence_records";
 
+    private Handler mHandler = new Handler();
+    //check if enable GPS popup is active
+    Boolean gpsClicked = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +37,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         checkPermissions(MainActivity.this);
-
+        GPSEnabled();
         myDB = new DatabaseHelper(this);
         myDB.createTable(table_name);
 
@@ -44,6 +53,53 @@ public class MainActivity extends AppCompatActivity
         startService(intent);
         Intent all = new Intent(this, StartService.class);
         startService(all);
+    }
+
+    public void GPSEnabled() {
+        final int FIVE_SEC = 5000;
+
+        mHandler.postDelayed(new Runnable() {
+            public void run() {
+                LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                if(!statusOfGPS && !gpsClicked){
+                    showDialogGPS();
+                }
+                mHandler.postDelayed(this, FIVE_SEC);
+            }
+        }, FIVE_SEC);
+        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if(!statusOfGPS && !gpsClicked){
+            showDialogGPS();
+        }
+    }
+    /**
+     * Show a dialog to the user requesting that GPS be enabled
+     */
+    public void showDialogGPS() {
+        gpsClicked = true;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setTitle("Enable GPS");
+        builder.setMessage("Please enable GPS");
+        builder.setInverseBackgroundForced(true);
+        builder.setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                startActivity(
+                        new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                dialog.dismiss();
+                gpsClicked = false;
+            }
+        });
+        builder.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                gpsClicked = false;
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     @Override

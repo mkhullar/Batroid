@@ -1,22 +1,15 @@
 package mcgroup10.com.batroid;
 
-import android.Manifest;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Created by abhishekzambre on 13/11/16.
+ * Created by murali on 13/11/16.
  */
 
 public class AutoReply extends AppCompatActivity {
@@ -27,17 +20,18 @@ public class AutoReply extends AppCompatActivity {
     StringBuffer sb = new StringBuffer();
     TextView textDetail;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    //@RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_autoreply);
         textDetail = (TextView) findViewById(R.id.textView1);
-        checkReceivePermission();
+        //checkReceivePermission();
+        startYourWork();
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    /*@RequiresApi(api = Build.VERSION_CODES.M)
     private void checkReceivePermission() {
         List<String> permissionsNeeded = new ArrayList<String>();
 
@@ -71,7 +65,7 @@ public class AutoReply extends AppCompatActivity {
             return;
         }
         startYourWork();
-    }
+    }*/
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(AutoReply.this)
@@ -82,7 +76,7 @@ public class AutoReply extends AppCompatActivity {
                 .show();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+   /* @RequiresApi(api = Build.VERSION_CODES.M)
     private boolean addPermission(List<String> permissionsList, String permission) {
         if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
             permissionsList.add(permission);
@@ -91,7 +85,7 @@ public class AutoReply extends AppCompatActivity {
                 return false;
         }
         return true;
-    }
+    }*/
 
     protected void startYourWork() {
         sb.append("Auto-Reply mode is on!");

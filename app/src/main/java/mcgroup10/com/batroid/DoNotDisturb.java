@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -66,8 +65,8 @@ public class DoNotDisturb extends AppCompatActivity
     String table_name = "geofence_records";
     boolean saveGeofenceSuccess = false;
     TextView locationNameTextView;
-    String locationName="";
-    String geofence_change_status="";
+    String locationName = "";
+    String geofence_change_status = "";
 
     private AudioManager myAudioManager;
 
@@ -84,10 +83,11 @@ public class DoNotDisturb extends AppCompatActivity
     private MapFragment mapFragment;
 
     private static final String NOTIFICATION_MSG = "NOTIFICATION MSG";
+
     // Create a Intent send by the notification
     public static Intent makeNotificationIntent(Context context, String msg) {
-        Intent intent = new Intent( context, DoNotDisturb.class );
-        intent.putExtra( NOTIFICATION_MSG, msg );
+        Intent intent = new Intent(context, DoNotDisturb.class);
+        intent.putExtra(NOTIFICATION_MSG, msg);
         return intent;
     }
 
@@ -105,7 +105,7 @@ public class DoNotDisturb extends AppCompatActivity
         createGoogleApi();
 
         final AudioManager mode = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        myAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        myAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         IntentFilter broadcastFilter = new IntentFilter(ResponseReceiver.LOCAL_ACTION);
         receiver = new ResponseReceiver();
@@ -118,13 +118,14 @@ public class DoNotDisturb extends AppCompatActivity
 
     }
 
-    public void broadcastIntent(View view){
+    public void broadcastIntent(View view) {
         Intent intent = new Intent();
-        intent.setAction("mcgroup10.com.batroid.CUSTOM_INTENT"); sendBroadcast(intent);
+        intent.setAction("mcgroup10.com.batroid.CUSTOM_INTENT");
+        sendBroadcast(intent);
     }
 
     // Initialize GoogleMaps
-    private void initGMaps(){
+    private void initGMaps() {
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
@@ -132,11 +133,11 @@ public class DoNotDisturb extends AppCompatActivity
     // Create GoogleApiClient instance
     private void createGoogleApi() {
         Log.d(TAG, "createGoogleApi()");
-        if ( googleApiClient == null ) {
-            googleApiClient = new GoogleApiClient.Builder( this )
-                    .addConnectionCallbacks( this )
-                    .addOnConnectionFailedListener( this )
-                    .addApi( LocationServices.API )
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
                     .build();
         }
     }
@@ -157,19 +158,15 @@ public class DoNotDisturb extends AppCompatActivity
         googleApiClient.disconnect();
     }
 
-    public void startGeoClick(View view){
-        //Toast.makeText(getApplicationContext(), "Phone : Silent", Toast.LENGTH_SHORT).show();
+    public void startGeoClick(View view) {
         startGeofence();
-        //myAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
     }
 
-    public void stopGeoClick(View view){
-        //Toast.makeText(getApplicationContext(), "Phone : Ring", Toast.LENGTH_SHORT).show();
+    public void stopGeoClick(View view) {
         clearGeofence();
-        //myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
     }
 
-    public void saveGeofenceClick(View view){
+    public void saveGeofenceClick(View view) {
         //Toast.makeText(getApplicationContext(), "Phone : Ring", Toast.LENGTH_SHORT).show();
         saveGeofenceinDB();
         //myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
@@ -182,7 +179,7 @@ public class DoNotDisturb extends AppCompatActivity
         Log.d(TAG, "checkPermission()");
         // Ask for permission if it wasn't granted yet
         return (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED );
+                == PackageManager.PERMISSION_GRANTED);
     }
 
     // Asks for permission
@@ -190,7 +187,7 @@ public class DoNotDisturb extends AppCompatActivity
         Log.d(TAG, "askPermission()");
         ActivityCompat.requestPermissions(
                 this,
-                new String[] { Manifest.permission.ACCESS_FINE_LOCATION },
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 REQ_PERMISSION
         );
     }
@@ -200,10 +197,10 @@ public class DoNotDisturb extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult()");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch ( requestCode ) {
+        switch (requestCode) {
             case REQ_PERMISSION: {
-                if ( grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED ){
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission granted
                     getLastKnownLocation();
 
@@ -223,7 +220,6 @@ public class DoNotDisturb extends AppCompatActivity
     }
 
 
-
     // Callback called when Map is ready
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -235,37 +231,37 @@ public class DoNotDisturb extends AppCompatActivity
 
     @Override
     public void onMapClick(LatLng latLng) {
-        Log.d(TAG, "onMapClick("+latLng +")");
+        Log.d(TAG, "onMapClick(" + latLng + ")");
         markerForGeofence(latLng);
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Log.d(TAG, "onMarkerClickListener: " + marker.getPosition() );
+        Log.d(TAG, "onMarkerClickListener: " + marker.getPosition());
         return false;
     }
 
     private LocationRequest locationRequest;
     // Defined in mili seconds.
     // This number in extremely low, and should be used only for debug
-    private final int UPDATE_INTERVAL =  1000;
+    private final int UPDATE_INTERVAL = 1000;
     private final int FASTEST_INTERVAL = 900;
 
     // Start location Updates
-    private void startLocationUpdates(){
+    private void startLocationUpdates() {
         Log.i(TAG, "startLocationUpdates()");
         locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL)
                 .setFastestInterval(FASTEST_INTERVAL);
 
-        if ( checkPermission() )
+        if (checkPermission())
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "onLocationChanged ["+location+"]");
+        Log.d(TAG, "onLocationChanged [" + location + "]");
         lastLocation = location;
         writeActualLocation(location);
     }
@@ -275,7 +271,7 @@ public class DoNotDisturb extends AppCompatActivity
     public void onConnected(@Nullable Bundle bundle) {
         Log.i(TAG, "onConnected()");
         getLastKnownLocation();
-        recoverGeofenceMarker();
+        //recoverGeofenceMarker();
     }
 
     // GoogleApiClient.ConnectionCallbacks suspended
@@ -293,9 +289,9 @@ public class DoNotDisturb extends AppCompatActivity
     // Get last known location
     private void getLastKnownLocation() {
         Log.d(TAG, "getLastKnownLocation()");
-        if ( checkPermission() ) {
+        if (checkPermission()) {
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if ( lastLocation != null ) {
+            if (lastLocation != null) {
                 Log.i(TAG, "LasKnown location. " +
                         "Long: " + lastLocation.getLongitude() +
                         " | Lat: " + lastLocation.getLatitude());
@@ -305,13 +301,12 @@ public class DoNotDisturb extends AppCompatActivity
                 Log.w(TAG, "No location retrieved yet");
                 startLocationUpdates();
             }
-        }
-        else askPermission();
+        } else askPermission();
     }
 
     private void writeActualLocation(Location location) {
-        textLat.setText( "Lat: " + location.getLatitude() );
-        textLong.setText( "Long: " + location.getLongitude() );
+        textLat.setText("Lat: " + location.getLatitude());
+        textLong.setText("Long: " + location.getLongitude());
 
         markerLocation(new LatLng(location.getLatitude(), location.getLongitude()));
     }
@@ -321,14 +316,15 @@ public class DoNotDisturb extends AppCompatActivity
     }
 
     private Marker locationMarker;
+
     private void markerLocation(LatLng latLng) {
-        Log.i(TAG, "markerLocation("+latLng+")");
+        Log.i(TAG, "markerLocation(" + latLng + ")");
         String title = latLng.latitude + ", " + latLng.longitude;
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(latLng)
                 .title(title);
-        if ( map!=null ) {
-            if ( locationMarker != null )
+        if (map != null) {
+            if (locationMarker != null)
                 locationMarker.remove();
             locationMarker = map.addMarker(markerOptions);
             float zoom = 18.5f;
@@ -339,15 +335,16 @@ public class DoNotDisturb extends AppCompatActivity
 
 
     private Marker geoFenceMarker;
+
     private void markerForGeofence(LatLng latLng) {
-        Log.i(TAG, "markerForGeofence("+latLng+")");
+        Log.i(TAG, "markerForGeofence(" + latLng + ")");
         String title = latLng.latitude + ", " + latLng.longitude;
         // Define marker options
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(latLng)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
                 .title(title);
-        if ( map!=null ) {
+        if (map != null) {
             // Remove last geoFenceMarker
             if (geoFenceMarker != null)
                 geoFenceMarker.remove();
@@ -362,9 +359,9 @@ public class DoNotDisturb extends AppCompatActivity
     private void saveGeofenceinDB() {
         Log.i(TAG, "saveGeofenceinDB()");
         locationNameTextView = (TextView) findViewById(R.id.editText);
-        if( geoFenceMarker != null ) {
+        if (geoFenceMarker != null) {
             locationName = locationNameTextView.getText().toString();
-            if(locationName != null && !locationName.isEmpty()) {
+            if (locationName != null && !locationName.isEmpty()) {
                 saveGeofenceSuccess = myDB.insertData(table_name, locationName.trim(), Double.toString(geoFenceMarker.getPosition().latitude), Double.toString(geoFenceMarker.getPosition().longitude));
                 if (saveGeofenceSuccess)
                     Toast.makeText(getApplicationContext(), "Location saved successfully!", Toast.LENGTH_SHORT).show();
@@ -387,10 +384,10 @@ public class DoNotDisturb extends AppCompatActivity
         Geofence geofence;
         LatLng latLng;
         while (res.moveToNext()) {
-            latLng = new LatLng( Double.parseDouble(res.getString(1)), Double.parseDouble(res.getString(2)));
-            geofence = createGeofence( latLng , GEOFENCE_RADIUS, res.getString(0) );
-            GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
-            addGeofence( geofenceRequest );
+            latLng = new LatLng(Double.parseDouble(res.getString(1)), Double.parseDouble(res.getString(2)));
+            geofence = createGeofence(latLng, GEOFENCE_RADIUS, res.getString(0));
+            GeofencingRequest geofenceRequest = createGeofenceRequest(geofence);
+            addGeofence(geofenceRequest);
         }
         res.close();
 
@@ -408,23 +405,23 @@ public class DoNotDisturb extends AppCompatActivity
     private static final float GEOFENCE_RADIUS = 20.0f; // in meters
 
     // Create a Geofence
-    private Geofence createGeofence( LatLng latLng, float radius, String name ) {
+    private Geofence createGeofence(LatLng latLng, float radius, String name) {
         Log.d(TAG, "createGeofence");
         return new Geofence.Builder()
                 .setRequestId(name)
-                .setCircularRegion( latLng.latitude, latLng.longitude, radius)
-                .setExpirationDuration( GEO_DURATION )
-                .setTransitionTypes( Geofence.GEOFENCE_TRANSITION_ENTER
-                        | Geofence.GEOFENCE_TRANSITION_EXIT )
+                .setCircularRegion(latLng.latitude, latLng.longitude, radius)
+                .setExpirationDuration(GEO_DURATION)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER
+                        | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .build();
     }
 
     // Create a Geofence Request
-    private GeofencingRequest createGeofenceRequest( Geofence geofence ) {
+    private GeofencingRequest createGeofenceRequest(Geofence geofence) {
         Log.d(TAG, "createGeofenceRequest");
         return new GeofencingRequest.Builder()
-                .setInitialTrigger( GeofencingRequest.INITIAL_TRIGGER_ENTER )
-                .addGeofence( geofence )
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .addGeofence(geofence)
                 .build();
     }
 
@@ -433,12 +430,12 @@ public class DoNotDisturb extends AppCompatActivity
 
     private PendingIntent createGeofencePendingIntent() {
         Log.d(TAG, "createGeofencePendingIntent");
-        if ( geoFencePendingIntent != null )
+        if (geoFencePendingIntent != null)
             return geoFencePendingIntent;
-        Intent intent = new Intent( DoNotDisturb.this, GeofenceTransitionService.class);
+        Intent intent = new Intent(DoNotDisturb.this, GeofenceTransitionService.class);
 
         return PendingIntent.getService(
-                this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+                this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     // Add the created GeofenceRequest to the device's monitoring list
@@ -455,8 +452,8 @@ public class DoNotDisturb extends AppCompatActivity
     @Override
     public void onResult(@NonNull Status status) {
         Log.i(TAG, "onResult: " + status);
-        if ( status.isSuccess() ) {
-            saveGeofence();
+        if (status.isSuccess()) {
+            //saveGeofence();
             drawGeofence();
         } else {
             // inform about fail
@@ -466,6 +463,7 @@ public class DoNotDisturb extends AppCompatActivity
 
     // Draw Geofence circle on GoogleMap
     private Circle geoFenceLimits;
+
     private void drawGeofence() {
         Log.d(TAG, "drawGeofence()");
 
@@ -475,13 +473,13 @@ public class DoNotDisturb extends AppCompatActivity
         Cursor res = myDB.getAllData(table_name);
         LatLng latLng;
         while (res.moveToNext()) {
-            latLng = new LatLng( Double.parseDouble(res.getString(1)), Double.parseDouble(res.getString(2)));
+            latLng = new LatLng(Double.parseDouble(res.getString(1)), Double.parseDouble(res.getString(2)));
             circleOptions = new CircleOptions()
-                    .center( latLng )
-                    .strokeColor(Color.argb(50, 70,70,70))
-                    .fillColor( Color.argb(100, 150,150,150) )
-                    .radius( GEOFENCE_RADIUS );
-            geoFenceLimits = map.addCircle( circleOptions );
+                    .center(latLng)
+                    .strokeColor(Color.argb(50, 70, 70, 70))
+                    .fillColor(Color.argb(100, 150, 150, 150))
+                    .radius(GEOFENCE_RADIUS);
+            geoFenceLimits = map.addCircle(circleOptions);
             //geofence = createGeofence( latLng , GEOFENCE_RADIUS );
             //GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
             //addGeofence( geofenceRequest );
@@ -500,13 +498,13 @@ public class DoNotDisturb extends AppCompatActivity
         geoFenceLimits = map.addCircle( circleOptions );*/
     }
 
-    private final String KEY_GEOFENCE_LAT = "GEOFENCE LATITUDE";
+/*    private final String KEY_GEOFENCE_LAT = "GEOFENCE LATITUDE";
     private final String KEY_GEOFENCE_LON = "GEOFENCE LONGITUDE";
 
     // Saving GeoFence marker with prefs mng
     private void saveGeofence() {
         Log.d(TAG, "saveGeofence()");
-        SharedPreferences sharedPref = getPreferences( Context.MODE_PRIVATE );
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
         //editor.putLong( KEY_GEOFENCE_LAT, Double.doubleToRawLongBits( geoFenceMarker.getPosition().latitude ));
@@ -517,16 +515,16 @@ public class DoNotDisturb extends AppCompatActivity
     // Recovering last Geofence marker
     private void recoverGeofenceMarker() {
         Log.d(TAG, "recoverGeofenceMarker");
-        SharedPreferences sharedPref = getPreferences( Context.MODE_PRIVATE );
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
 
-        if ( sharedPref.contains( KEY_GEOFENCE_LAT ) && sharedPref.contains( KEY_GEOFENCE_LON )) {
-            double lat = Double.longBitsToDouble( sharedPref.getLong( KEY_GEOFENCE_LAT, -1 ));
-            double lon = Double.longBitsToDouble( sharedPref.getLong( KEY_GEOFENCE_LON, -1 ));
-            LatLng latLng = new LatLng( lat, lon );
+        if (sharedPref.contains(KEY_GEOFENCE_LAT) && sharedPref.contains(KEY_GEOFENCE_LON)) {
+            double lat = Double.longBitsToDouble(sharedPref.getLong(KEY_GEOFENCE_LAT, -1));
+            double lon = Double.longBitsToDouble(sharedPref.getLong(KEY_GEOFENCE_LON, -1));
+            LatLng latLng = new LatLng(lat, lon);
             markerForGeofence(latLng);
             drawGeofence();
         }
-    }
+    }*/
 
     // Clear Geofence
     private void clearGeofence() {
@@ -537,7 +535,7 @@ public class DoNotDisturb extends AppCompatActivity
         ).setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(@NonNull Status status) {
-                if ( status.isSuccess() ) {
+                if (status.isSuccess()) {
                     // remove drawing
                     removeGeofenceDraw();
                 }
@@ -547,31 +545,32 @@ public class DoNotDisturb extends AppCompatActivity
 
     private void removeGeofenceDraw() {
         Log.d(TAG, "removeGeofenceDraw()");
-        if ( geoFenceMarker != null)
+        if (geoFenceMarker != null)
             geoFenceMarker.remove();
-        if ( geoFenceLimits != null )
+        if (geoFenceLimits != null)
             geoFenceLimits.remove();
         map.clear();
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager localBroadcastManager= LocalBroadcastManager.getInstance(this);
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.unregisterReceiver(receiver);
     }
 
     public class ResponseReceiver extends BroadcastReceiver {
         public static final String LOCAL_ACTION = "mcgroup10.com.batroid.CUSTOM_INTENT";
+
         @Override
         public void onReceive(Context context, Intent intent) {
-            geofence_change_status=intent.getStringExtra("Status");
+            geofence_change_status = intent.getStringExtra("Status");
             Toast.makeText(context, geofence_change_status, Toast.LENGTH_LONG).show();
 
             if (geofence_change_status.startsWith("Entering"))
-            myAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                myAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             if (geofence_change_status.startsWith("Exiting"))
-            myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         }
     }
 }
