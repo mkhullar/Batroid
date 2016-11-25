@@ -14,10 +14,6 @@
             android:id="@+id/nav_route"
             android:icon="@drawable/ic_navigation_black"
             android:title="Route" />
-        <!--item
-            android:id="@+id/nav_autosms"
-            android:icon="@drawable/ic_sms_black"
-            android:title="Auto Reply" /-->
         <item
             android:id="@+id/nav_birthday"
             android:icon="@drawable/ic_cake_black"

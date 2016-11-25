@@ -75,9 +75,9 @@ public class Birthdays extends AppCompatActivity {
             String name = cursor.getString(nameColumn);
 
             Date date = new Date();
-            String modifiedDate = new SimpleDateFormat("yyyy-MM-dd").format(date);
+            String modifiedDate = new SimpleDateFormat("MM-dd").format(date);
 
-            if (modifiedDate.equals(bDay)) {
+            if (bDay.contains(modifiedDate)) {
                 number = getPhoneNumber(this, name);
                 Log.d(TAG, "Name: " + name);
                 Log.d(TAG, "Birthday: " + bDay);
